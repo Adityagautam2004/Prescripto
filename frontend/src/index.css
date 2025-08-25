@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
 @import "tailwindcss";
 
 /* Define custom properties (CSS variables) for your colors and grid */
@@ -6,6 +8,9 @@
   /* --color-secondary: #F3F4F6; */
   /* --color-accent: #D1D5DB; */
   --grid-auto: repeat(auto-fill, minmax(200px,1fr));
+}
+* {
+  font-family:  Outfit ;
 }
 
 /* Custom utility classes using your variables */
