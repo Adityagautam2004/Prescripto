@@ -11,6 +11,9 @@ export default {
         // secondary: '#F3F4F6',
         // accent: '#D1D5DB',
       },
+      gridTemplateColumns:{
+        'auto':'repeat(auto-fill, minmax(200px,1fr))'
+      }
     },
   },
   plugins: [],

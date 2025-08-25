@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/* Define custom properties (CSS variables) for your colors and grid */
+:root {
+  --color-primary: #5f6FFF;
+  /* --color-secondary: #F3F4F6; */
+  /* --color-accent: #D1D5DB; */
+  --grid-auto: repeat(auto-fill, minmax(200px,1fr));
+}
+
+/* Custom utility classes using your variables */
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+.text-primary {
+  color: var(--color-primary) !important;
+}
+.border-primary {
+  border-color: var(--color-primary) !important;
+}
+.grid-cols-auto {
+  grid-template-columns: var(--grid-auto) !important;
+}
+
 .active hr {
-    @apply block
+  @apply block;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
