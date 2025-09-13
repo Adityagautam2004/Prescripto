@@ -114,4 +114,24 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-export { addDoctor, loginAdmin };
+//api for get all doctors
+
+const allDoctors = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({}).select("-password");
+    res.json({
+      message: "Doctors fetched successfully",
+      success: true,
+      doctors,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Error fetching doctors",
+      success: false,
+      error,
+    });
+  }
+};
+
+export { addDoctor, loginAdmin, allDoctors };

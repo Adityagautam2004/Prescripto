@@ -4,6 +4,7 @@ import dotenv from 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './routes/adminRoute.js';
+import doctorRouter from './routes/doctorRoute.js';
 
 
 // Initialize express app
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/admin", adminRouter);
 //localhost:5000/api/admin/add-doctor
+app.use("/api/doctor", doctorRouter);
+
 
 app.get('/', (req, res) => {
   res.send('Hello from the backend!');
