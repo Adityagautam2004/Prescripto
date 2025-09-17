@@ -7,6 +7,8 @@ export const AdminContext = createContext();
 export const AdminContextProvider = (props) => {
   const [aToken, setAToken] = useState(localStorage.getItem("aToken")? localStorage.getItem('aToken'):(""));
   const [doctors, setDoctors] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL
 
@@ -47,14 +49,73 @@ export const AdminContextProvider = (props) => {
     }
   }
 
+  const getAllAppointments = async () => {
+    try {
+      const {data} = await axios.get(backendUrl+"/api/admin/appointments", {
+        headers: {
+          aToken
+        },
+      });
+      if(data.success){
+        setAppointments(data.appointments);
+        toast.success(data.message);
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const {data} = await axios.post(backendUrl+"/api/admin/cancel-appointment",{
+        appointmentId
+      }, {
+        headers: {
+          aToken
+        },
+      });
+      if(data.success){
+        toast.success(data.message);
+        getAllAppointments();
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getDashData = async () => {
+    try {
+      const {data} = await axios.get(backendUrl+"/api/admin/dashboard", {
+        headers: {
+          aToken
+        },
+      });
+      if(data.success){
+        setDashData(data.dashData);
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const value = {
     aToken,
     setAToken,
     backendUrl,
     getAllDoctors,
     doctors,
-    changeAvailibility
-  
+    changeAvailibility,
+    getAllAppointments,
+    appointments, setAppointments,
+    cancelAppointment,
+    getDashData,
+    dashData
   };
   return (
     <AdminContext.Provider value={value}>

@@ -2,11 +2,16 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+
+
 
 const MyAppointments = () => {
   const {backendURL, token, getDoctorsData} = useContext(AppContext)
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const navigate = useNavigate()
 
   const fetchAppointments = async () => {
     try {
@@ -42,6 +47,61 @@ const MyAppointments = () => {
     } catch (error) {
       console.log(error)
       toast.error('Error canceling appointment')
+    }
+  }
+
+  const initPay = (order)=>{
+    const options = {
+      "key": import.meta.env.VITE_RAZORPAY_KEY_ID, 
+      "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      "currency": order.currency,
+      "name": "Appointment Payment",
+      "description": "Test Transaction",
+      // "image": "https://example.com/your_logo",
+      "order_id": order.id,
+      "receipt": order.receipt,
+      "handler":async (response)=>{
+        console.log(response)
+        try {
+          const {data} = await axios.post(backendURL + '/api/user/verifyRazorpay', {
+            razorpay_order_id: response.razorpay_order_id
+          }, {
+            headers: {token}
+          })
+          if(data.success) {
+            toast.success(data.message)
+            fetchAppointments()
+            navigate('/my-appointments')
+          } else {
+            toast.error(data.message)
+          }
+        } catch (error) {
+          console.log(error)
+          toast.error('Error verifying payment')
+        }
+      },
+  }
+  const rzp = new window.Razorpay(options)
+  rzp.open()
+}
+
+  
+  const appointmentRazorpay = async (appointmentId) => {
+    try {
+      const {data} = await axios.post(backendURL + '/api/user/payment-razorpay', {
+        appointmentId
+      }, {
+        headers: {token}
+      })
+      if(data.success) {
+        console.log(data.order)
+        initPay(data.order)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error('Error payment appointment')
     }
   }
 
@@ -123,8 +183,13 @@ const MyAppointments = () => {
               </div>
               <div></div>
               <div className='flex flex-col gap-2 justify-end'>
+                {appointment.payment && (
+                  <button className='sm:min-w-48 py-2 border border-green-500 text-green-500 rounded'>
+                    Paid
+                  </button>
+                )}
                 {!appointment.payment && !appointment.cancelled && (
-                  <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-[#5f6FFF] hover:text-white transition-all duration-300'>
+                  <button onClick={() => appointmentRazorpay(appointment._id)} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-[#5f6FFF] hover:text-white transition-all duration-300'>
                     Pay Online 
                   </button>
                 )}
