@@ -12,13 +12,6 @@ const authUser = (req, res, next) => {
             });
         }
         const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-        // if(token_decode.id !== req.body.userId){
-        //     return res.status(401).send({
-        //         message: "Unauthorized",
-        //         success: false,
-        //     });
-        // }
-        // Ensure req.body exists before setting userId
         if (!req.body) {
             req.body = {};
         }
