@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 const MyAppointments = () => {
-  const {backendURL, token, getDoctorsData} = useContext(AppContext)
+  const {backendURL, token, getDoctorsData, userData} = useContext(AppContext)
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -89,8 +89,13 @@ const MyAppointments = () => {
   
   const appointmentRazorpay = async (appointmentId) => {
     try {
+      // Extract userId from appointment data since userData might not be available
+      const appointment = appointments.find(a => a._id === appointmentId);
+      const userId = appointment?.userId;
+      
       const {data} = await axios.post(backendURL + '/api/user/payment-razorpay', {
-        appointmentId
+        appointmentId,
+        userId
       }, {
         headers: {token}
       })

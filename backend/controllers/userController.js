@@ -317,7 +317,7 @@ const razorpayInstance = new razorpay({
 
 const paymentRazorpay = async (req, res) => {
   try {
-    const { appointmentId } = req.body;
+    const { appointmentId, userId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
     if (!appointmentData || appointmentData.cancelled) {
       return res
@@ -341,7 +341,6 @@ const paymentRazorpay = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Payment already done" });
     }
-    const { userId } = req.body;
     // creating options for razorpay payment
     const options = {
       amount: appointmentData.amount * 100,
