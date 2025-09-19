@@ -26,7 +26,7 @@ const AllAppointments = () => {
           <p>Actions</p>
         </div>
 
-        {appointments.map((appointment, index) => (
+        {appointments.reverse().map((appointment, index) => (
           <div key={index} className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50'>
             <p className='max-sm:hidden'>{index + 1}</p>
             <div className='flex items-center gap-2'>
@@ -39,7 +39,7 @@ const AllAppointments = () => {
             </div>
             <p>{currency} {appointment.amount}</p>
             {
-              appointment.cancelled ? <p className='text-red-500'>Cancelled</p> :  <img onClick={() => cancelAppointment(appointment._id)} className='w-10 cursor pointer' src={assets.cancel_icon} alt="" />
+              appointment.cancelled ? <p className='text-red-500'>Cancelled</p> : appointment.isCompleted ? <p className='text-green-500'>Completed</p> : <img onClick={() => cancelAppointment(appointment._id)} className='w-10 cursor pointer' src={assets.cancel_icon} alt="" />
             }
           </div>
         ))}

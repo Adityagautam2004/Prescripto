@@ -18,6 +18,7 @@ const MyAppointments = () => {
       const {data} = await axios.get(backendURL + '/api/user/get-appointments', {
         headers: {token}
       })
+      console.log(data);
       if(data.success) {
         setAppointments(data.appointments)
       } else {
@@ -183,17 +184,17 @@ const MyAppointments = () => {
               </div>
               <div></div>
               <div className='flex flex-col gap-2 justify-end'>
-                {appointment.payment && (
+                {appointment.payment && !appointment.isCompleted &&(
                   <button className='sm:min-w-48 py-2 border border-green-500 text-green-500 rounded'>
                     Paid
                   </button>
                 )}
-                {!appointment.payment && !appointment.cancelled && (
+                {!appointment.payment && !appointment.cancelled && !appointment.isCompleted && (
                   <button onClick={() => appointmentRazorpay(appointment._id)} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-[#5f6FFF] hover:text-white transition-all duration-300'>
                     Pay Online 
                   </button>
                 )}
-                {!appointment.cancelled && !appointment.isCompleted && (
+                {!appointment.cancelled && !appointment.isCompleted && !appointment.payment && (
                   <button onClick={() => cancelAppointment(appointment._id)} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-500 hover:text-white transition-all duration-300'>
                     Cancel Appointment
                   </button>

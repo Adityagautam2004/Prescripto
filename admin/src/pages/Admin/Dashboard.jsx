@@ -38,7 +38,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div>
+      <div className='bg-white'>
         <div className='flex items-center gap-2.5 px-4 py-4 mt-10 rounded-t border'>
           <img src={assets.list_icon} alt="" />
           <p className='font-semibold'>Latest Bookings</p>
@@ -53,8 +53,8 @@ const Dashboard = () => {
                 <p className='text-gray-800 font-medium'>{item.docData.name}</p>
                 <p className='text-gray-600'>{item.slotDate}</p>
               </div>
-               {
-              item.cancelled ? <p className='text-red-500'>Cancelled</p> :  <img onClick={() => cancelAppointment(item._id)} className='w-10 cursor pointer' src={assets.cancel_icon} alt="" />
+                {
+              item.cancelled ? <p className='text-red-500'>Cancelled</p> : item.isCompleted ? <p className='text-green-500'>Completed</p> : <img onClick={() => cancelAppointment(item._id)} className='w-10 cursor pointer' src={assets.cancel_icon} alt="" />
             }
             </div>
           ))
