@@ -49,7 +49,7 @@ export const AdminContextProvider = (props) => {
     }
   }
 
-  const getAllAppointments = async () => {
+  const getAllAppointments = async (showToast = false) => {
     try {
       const {data} = await axios.get(backendUrl+"/api/admin/appointments", {
         headers: {
@@ -58,17 +58,30 @@ export const AdminContextProvider = (props) => {
       });
       if(data.success){
         setAppointments(data.appointments);
-        toast.success(data.message);
+        // Only show success toast when explicitly requested (not during initial load)
+        if (showToast) {
+          toast.success(data.message || "Appointments loaded successfully");
+        }
       }else{
-        toast.error(data.message);
+        toast.error(data.message || "Failed to load appointments");
       }
     } catch (error) {
       console.log(error);
+      toast.error("Error loading appointments. Please try again.");
     }
   }
 
   const cancelAppointment = async (appointmentId) => {
     try {
+      // Update local state immediately for better UX
+      setAppointments(prevAppointments => 
+        prevAppointments.map(appointment => 
+          appointment._id === appointmentId 
+            ? { ...appointment, cancelled: true } 
+            : appointment
+        )
+      );
+
       const {data} = await axios.post(backendUrl+"/api/admin/cancel-appointment",{
         appointmentId
       }, {
@@ -76,14 +89,21 @@ export const AdminContextProvider = (props) => {
           aToken
         },
       });
+      
       if(data.success){
-        toast.success(data.message);
-        getAllAppointments();
-      }else{
-        toast.error(data.message);
-      }
+          toast.success(data.message);
+          // Refresh data from server to ensure consistency
+          getAllAppointments(true);
+        }else{
+          toast.error(data.message);
+          // Revert the optimistic update if the API call fails
+          getAllAppointments();
+        }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to cancel appointment");
+      // Revert the optimistic update if the API call fails
+      getAllAppointments();
     }
   }
 

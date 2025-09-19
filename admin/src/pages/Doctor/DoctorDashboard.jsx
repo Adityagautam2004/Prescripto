@@ -52,13 +52,12 @@ const DoctorDashboard = () => {
         </div>
 
         <div className='pt-4 border border-t-0'>
-           console.log(dashData.appointments);
          {
-          dashData.appointments.map((item, index)=>(
+          dashData.latestAppointments && dashData.latestAppointments.map((item, index)=>(
             <div className='flex items-center gap-3 px-6 py-3 hover:bg-gray-100' key={index}>
-              <img className='rounded-full w-10' src={item.userData.image} alt="" />
+              <img className='rounded-full w-10' src={item.userData?.image || 'https://via.placeholder.com/150'} alt="Patient" />
               <div className='flex-1 text-sm'>
-                <p className='text-gray-800 font-medium'>{item.userData.name}</p>
+                <p className='text-gray-800 font-medium'>{item.userData?.name || 'Unknown Patient'}</p>
                 <p className='text-gray-600'>{item.slotDate}</p>
               </div>
                 {item.cancelled ? (

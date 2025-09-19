@@ -3,6 +3,17 @@ import { AdminContext } from '../../context/AdminContext';
 import { AppContext } from '../../context/AppContext';
 import {assets} from '../../assets/assets.js';
 
+// Format time to show only hours and minutes (no seconds)
+const formatTime = (timeString) => {
+  const timeParts = timeString.match(/(\d{1,2}):(\d{2}):?(\d{2})?\s*(AM|PM)?/i);
+  if (!timeParts) return timeString; // Return original if invalid format
+
+  let [, hours, minutes] = timeParts;
+  const period = timeParts[4]?.toUpperCase() || '';
+
+  return `${hours}:${minutes} ${period}`.trim();
+};
+
 const AllAppointments = () => {
   const {aToken, appointments ,getAllAppointments, cancelAppointment} = useContext(AdminContext);
   const {calculateAge, currency} = useContext(AppContext);
@@ -33,14 +44,12 @@ const AllAppointments = () => {
               <img className='w-8 rounded-full' src={appointment.userData.image} alt='' /> <p>{appointment.userData.name}</p>
             </div>
             <p className='max-sm:hidden'>{calculateAge(appointment.userData.dob)}</p>
-            <p>{appointment.slotDate} {appointment.slotTime}</p>
+            <p>{appointment.slotDate} {formatTime(appointment.slotTime)}</p>
              <div className='flex items-center gap-2'>
               <img className='w-8 rounded-full bg-gray-200' src={appointment.docData.image} alt='' /> <p>{appointment.docData.name}</p>
             </div>
             <p>{currency} {appointment.amount}</p>
-            {
-              appointment.cancelled ? <p className='text-red-500'>Cancelled</p> : appointment.isCompleted ? <p className='text-green-500'>Completed</p> : <img onClick={() => cancelAppointment(appointment._id)} className='w-10 cursor pointer' src={assets.cancel_icon} alt="" />
-            }
+            {appointment.cancelled ? <p className='text-red-500'>Cancelled</p> : appointment.isCompleted ? <p className='text-green-500'>Completed</p> : <img onClick={() => cancelAppointment(appointment._id)} className='w-10 cursor-pointer' src={assets.cancel_icon} alt="" />}
           </div>
         ))}
       </div>

@@ -115,14 +115,22 @@ const MyAppointments = () => {
     }
   }, [token])
 
+  // Format date to show in MM/DD/YYYY format
   const formatDate = (slotDate) => {
     const [day, month, year] = slotDate.split('-')
-    const date = new Date(year, month - 1, day)
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })
+    return `${day}/${month}/${year}`;
+  }
+
+  // Format time to show only hours and minutes (no seconds)
+  const formatTime = (timeString) => {
+    // Extract hours and minutes from time string
+    const timeParts = timeString.match(/(\d{1,2}):(\d{2}):?(\d{2})?\s*(AM|PM)?/i);
+    if (!timeParts) return timeString; // Return original if invalid format
+
+    let [, hours, minutes] = timeParts;
+    const period = timeParts[4]?.toUpperCase() || '';
+
+    return `${hours}:${minutes} ${period}`.trim();
   }
 
   if(loading) {
@@ -163,7 +171,7 @@ const MyAppointments = () => {
                 <p className='text-xs'>{appointment.docData.address.line2}</p>
                 <p className='text-xs mt-1'>
                   <span className='text-sm text-neutral-700 font-medium'>Date & Time: </span> 
-                  {formatDate(appointment.slotDate)} | {appointment.slotTime}
+                  {formatDate(appointment.slotDate)} | {formatTime(appointment.slotTime)}
                 </p>
                 {/* <p className='text-xs mt-1'>
                   <span className='text-sm text-neutral-700 font-medium'>Fee:</span> 

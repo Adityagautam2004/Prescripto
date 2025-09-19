@@ -15,7 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
 
-  const onSubmitHandler =async (e) =>{
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     try{
       if(state === 'Sign Up'){
@@ -47,7 +47,11 @@ const Login = () => {
     }
     catch(error){
       console.log(error);
-      toast.error(error.message);
+      if(error.response && error.response.data) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Connection error. Please try again later.");
+      }
     }
   }
   useEffect(() => {

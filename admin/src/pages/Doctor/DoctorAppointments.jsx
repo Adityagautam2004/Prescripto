@@ -3,6 +3,17 @@ import { DoctorContext } from "../../context/DoctorContext";
 import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
+// Format time to show only hours and minutes (no seconds)
+const formatTime = (timeString) => {
+  const timeParts = timeString.match(/(\d{1,2}):(\d{2}):?(\d{2})?\s*(AM|PM)?/i);
+  if (!timeParts) return timeString; // Return original if invalid format
+
+  let [, hours, minutes] = timeParts;
+  const period = timeParts[4]?.toUpperCase() || '';
+
+  return `${hours}:${minutes} ${period}`.trim();
+};
+
 
 const DoctorAppointments = () => {
   const {
@@ -53,7 +64,7 @@ const DoctorAppointments = () => {
             </div>
             <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
             <p>
-              {item.slotDate}, {item.slotTime}
+              {item.slotDate}, {formatTime(item.slotTime)}
             </p>
             <p>
               {currency}, {item.amount}

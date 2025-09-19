@@ -38,11 +38,22 @@ const Login = () => {
           setDToken(data.token);
           toast.success("Doctor login successful");
         } else {
-          toast.error(data.message);
+          // More specific error message for doctor login failures
+          if(data.message === "Invalid credentials") {
+            toast.error("Invalid Credentials");
+          } else if(data.message === "Doctor not found") {
+            toast.error("Invalid Credentials ");
+          } else {
+            toast.error(data.message);
+          }
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed. Please check your credentials.");
+      if(error.response && error.response.data) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Connection error. Please try again later.");
+      }
     }
   };
 
