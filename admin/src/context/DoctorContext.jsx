@@ -11,7 +11,7 @@ export const DoctorContextProvider = ( props ) => {
   const [dToken, setDToken] = useState(localStorage.getItem("dToken")? localStorage.getItem('dToken'):'');
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState({});
-  const [profileData, setProfileData] = useState(false);
+  const [profileData, setProfileData] = useState({});
 
   const getAppointments = async (showToast = false) => {
     try {
@@ -140,9 +140,9 @@ export const DoctorContextProvider = ( props ) => {
     }
   }
 
-  const toggleAvailability = async () => {
+  const toggleAvailability = async (newAvailability) => {
     try {
-      if (!profileData || !profileData._id) {
+      if (!profileData || profileData._id === undefined) {
         toast.error("Profile data not available");
         return;
       }
@@ -150,7 +150,7 @@ export const DoctorContextProvider = ( props ) => {
       // Toggle the availability using existing update-profile endpoint
       const {data} = await axios.post(backendUrl+"/api/doctor/update-profile", {
         docId: profileData._id,
-        available: !profileData.available
+        available: newAvailability !== undefined ? newAvailability : !profileData.available
       }, {
         headers: {
           dToken

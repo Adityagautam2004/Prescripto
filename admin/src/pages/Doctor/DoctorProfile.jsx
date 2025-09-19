@@ -8,31 +8,47 @@ const DoctorProfile = () => {
   const { dToken, profileData, setProfileData, getProfileData, backendUrl, toggleAvailability } = useContext(DoctorContext);
   const { currency } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
+  const [localFees, setLocalFees] = useState('');
+  const [localAddressLine1, setLocalAddressLine1] = useState('');
+  const [localAddressLine2, setLocalAddressLine2] = useState('');
+  const [localAvailable, setLocalAvailable] = useState(false);
 
   const updateProfile = async () => {
     try {
+      // Ensure we have all required data
+      if (!profileData || !profileData._id) {
+        toast.error("Profile data not available");
+        return;
+      }
+      
       // Send data in the format expected by the backend
       const requestData = {
-        address: profileData.address,
-        fees: profileData.fees,
-        available: profileData.available,
+        docId: profileData._id,  // Include docId which is required by backend
+        fees: localFees,
+        available: localAvailable,
+        // Format address to ensure it's properly structured
+        address: {
+          line1: localAddressLine1,
+          line2: localAddressLine2
+        }
       };
 
       const { data } = await axios.post(
-        `${backendUrl}/api/doctor/update-profile`, // Fixed URL to match backend route
-        requestData, // Send data directly without nesting
+        `${backendUrl}/api/doctor/update-profile`,
+        requestData,
         {
           headers: {
             dToken,
           },
         }
       );
+      
       if (data.success) {
         setIsEdit(false);
         getProfileData();
         toast.success("Profile updated successfully");
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to update profile");
       }
     } catch (error) {
       console.log(error);
@@ -46,8 +62,23 @@ const DoctorProfile = () => {
     }
   }, [dToken]);
 
+  // Initialize local state when profileData changes
+  useEffect(() => {
+    if (profileData && profileData._id) {
+      setLocalFees(profileData.fees || '');
+      setLocalAddressLine1(profileData.address?.line1 || '');
+      setLocalAddressLine2(profileData.address?.line2 || '');
+      setLocalAvailable(profileData.available || false);
+    }
+  }, [profileData]);
+
+  // Log isEdit state changes for debugging
+  useEffect(() => {
+    console.log('isEdit state changed:', isEdit);
+  }, [isEdit]);
+
   return (
-    profileData && (
+    profileData && profileData._id ? (
       <div>
         <div className="flex flex-col gap-4 m-5">
           <div>
@@ -88,13 +119,16 @@ const DoctorProfile = () => {
                 {isEdit ? (
                   <input
                     type="number"
-                    onChange={(e) =>
-                      setProfileData((prev) => ({
-                        ...prev,
-                        fees: e.target.value,
-                      }))
-                    }
-                    value={profileData.fees}
+                    className="border border-gray-300 rounded px-2 py-1 ml-1 w-24"
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      console.log('Fee input changed:', e.target.value);
+                      setLocalFees(e.target.value);
+                    }}
+                    onFocus={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    value={localFees}
+                    readOnly={false}
                   />
                 ) : (
                   profileData.fees
@@ -107,13 +141,16 @@ const DoctorProfile = () => {
                 {isEdit ? (
                   <input
                     type="text"
-                    onChange={(e) =>
-                      setProfileData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line1: e.target.value },
-                      }))
-                    }
-                    value={profileData.address.line1}
+                    className="border border-gray-300 rounded px-2 py-1 mb-2 w-full"
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      console.log('Address line1 changed:', e.target.value);
+                      setLocalAddressLine1(e.target.value);
+                    }}
+                    onFocus={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    value={localAddressLine1}
+                    readOnly={false}
                   />
                 ) : (
                   profileData.address.line1
@@ -122,13 +159,16 @@ const DoctorProfile = () => {
                 {isEdit ? (
                   <input
                     type="text"
-                    onChange={(e) =>
-                      setProfileData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line2: e.target.value },
-                      }))
-                    }
-                    value={profileData.address.line2}
+                    className="border border-gray-300 rounded px-2 py-1 w-full"
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      console.log('Address line2 changed:', e.target.value);
+                      setLocalAddressLine2(e.target.value);
+                    }}
+                    onFocus={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    value={localAddressLine2}
+                    readOnly={false}
                   />
                 ) : (
                   profileData.address.line2
@@ -138,8 +178,12 @@ const DoctorProfile = () => {
 
             <div className="flex gap-1 pt-2">
               <input
-                onChange={toggleAvailability}
-                checked={profileData.available}
+                onChange={(e) => {
+                  const newAvailable = e.target.checked;
+                  setLocalAvailable(newAvailable);
+                  toggleAvailability(newAvailable);
+                }}
+                checked={localAvailable}
                 type="checkbox"
                 name="availability"
                 id="availability-checkbox"
@@ -157,7 +201,10 @@ const DoctorProfile = () => {
               </button>
             ) : (
               <button
-                onClick={() => setIsEdit(true)}
+                onClick={() => {
+                  console.log('Edit button clicked, setting isEdit to true');
+                  setIsEdit(true);
+                }}
                 className="px-4 py-1 border border-[#5F6FFF] text-sm rounded-full mt-5 hover:bg-[#5F6FFF] transition-all"
               >
                 Edit
@@ -166,6 +213,8 @@ const DoctorProfile = () => {
           </div>
         </div>
       </div>
+    ) : (
+      <div className="m-5 p-8 text-center text-gray-500">Loading profile data...</div>
     )
   );
 };
